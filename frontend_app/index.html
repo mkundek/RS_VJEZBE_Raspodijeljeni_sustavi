@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RS vježbe 1 – Frontend</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 640px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #f5f7fa;
+      color: #1f2933;
+    }
+    h1 { color: #2c5282; }
+    .kartica {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+    button {
+      background: #2c5282;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover { background: #2a4365; }
+    pre {
+      background: #edf2f7;
+      padding: 12px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Raspodijeljeni sustavi – Vježba 1</h1>
+
+  <div class="kartica">
+    <h2>Frontend aplikacija</h2>
+    <p>Ovo je statična HTML/CSS/JS stranica poslužena s Render.com.</p>
+    <p>Trenutno vrijeme u pregledniku: <strong id="vrijeme"></strong></p>
+  </div>
+
+  <div class="kartica">
+    <h2>Komunikacija s backendom</h2>
+    <p>U Zadatku 2 ovdje upisujemo URL backenda na Renderu.</p>
+    <button id="gumb">Pošalji zahtjev</button>
+    <pre id="odgovor">Još nema odgovora.</pre>
+  </div>
+
+  <script>
+    // Za Zadatak 2: ovdje upiši URL svog backenda na Renderu
+    const BACKEND_URL = "";
+
+    function prikaziVrijeme() {
+      document.getElementById("vrijeme").textContent =
+        new Date().toLocaleTimeString("hr-HR");
+    }
+    prikaziVrijeme();
+    setInterval(prikaziVrijeme, 1000);
+
+    document.getElementById("gumb").addEventListener("click", async () => {
+      const izlaz = document.getElementById("odgovor");
+      if (!BACKEND_URL) {
+        izlaz.textContent = "Backend još nije postavljen (Zadatak 2).";
+        return;
+      }
+      izlaz.textContent = "Šaljem zahtjev...";
+      try {
+        const res = await fetch(BACKEND_URL);
+        const podaci = await res.json();
+        izlaz.textContent = `Status: ${res.status}\n` + JSON.stringify(podaci, null, 2);
+      } catch (err) {
+        izlaz.textContent = "Greška: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
