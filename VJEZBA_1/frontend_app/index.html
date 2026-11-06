@@ -29,8 +29,16 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 1rem;
+      margin: 4px 4px 4px 0;
     }
     button:hover { background: #2a4365; }
+    input {
+      padding: 9px;
+      border: 1px solid #cbd2d9;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin: 4px 4px 4px 0;
+    }
     pre {
       background: #edf2f7;
       padding: 12px;
@@ -50,14 +58,24 @@
 
   <div class="kartica">
     <h2>Komunikacija s backendom</h2>
-    <p>U Zadatku 2 ovdje upisujemo URL backenda na Renderu.</p>
-    <button id="gumb">Pošalji zahtjev</button>
+    <p>Napomena: besplatni backend na Renderu "spava" kad se ne koristi,
+       pa prvi zahtjev može trajati i do jedne minute.</p>
+
+    <button id="gumbPozdrav">GET /</button>
+    <button id="gumbJelovnik">GET /jelovnik</button>
+
+    <h3>Dodaj jelo (POST /jelovnik)</h3>
+    <input id="naziv" placeholder="Naziv jela">
+    <input id="cijena" type="number" step="0.1" placeholder="Cijena">
+    <button id="gumbDodaj">Dodaj</button>
+
+    <h3>Odgovor poslužitelja</h3>
     <pre id="odgovor">Još nema odgovora.</pre>
   </div>
 
   <script>
-    // Za Zadatak 2: ovdje upiši URL svog backenda na Renderu
-    const BACKEND_URL = "";
+    // ⬇️ OVDJE upiši URL svog backenda na Renderu (bez / na kraju)
+    const BACKEND_URL = "https://UPISI-SVOJ-BACKEND.onrender.com";
 
     function prikaziVrijeme() {
       document.getElementById("vrijeme").textContent =
@@ -66,20 +84,41 @@
     prikaziVrijeme();
     setInterval(prikaziVrijeme, 1000);
 
-    document.getElementById("gumb").addEventListener("click", async () => {
-      const izlaz = document.getElementById("odgovor");
-      if (!BACKEND_URL) {
-        izlaz.textContent = "Backend još nije postavljen (Zadatak 2).";
-        return;
-      }
+    const izlaz = document.getElementById("odgovor");
+
+    async function posaljiZahtjev(putanja, opcije = {}) {
       izlaz.textContent = "Šaljem zahtjev...";
       try {
-        const res = await fetch(BACKEND_URL);
+        const res = await fetch(BACKEND_URL + putanja, opcije);
         const podaci = await res.json();
-        izlaz.textContent = `Status: ${res.status}\n` + JSON.stringify(podaci, null, 2);
+        izlaz.textContent =
+          `${opcije.method || "GET"} ${putanja} → Status: ${res.status}\n\n` +
+          JSON.stringify(podaci, null, 2);
       } catch (err) {
         izlaz.textContent = "Greška: " + err.message;
       }
+    }
+
+    document.getElementById("gumbPozdrav").addEventListener("click", () => {
+      posaljiZahtjev("/");
+    });
+
+    document.getElementById("gumbJelovnik").addEventListener("click", () => {
+      posaljiZahtjev("/jelovnik");
+    });
+
+    document.getElementById("gumbDodaj").addEventListener("click", () => {
+      const naziv = document.getElementById("naziv").value;
+      const cijena = parseFloat(document.getElementById("cijena").value);
+      if (!naziv || isNaN(cijena)) {
+        izlaz.textContent = "Upiši naziv i cijenu jela.";
+        return;
+      }
+      posaljiZahtjev("/jelovnik", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ naziv, cijena }),
+      });
     });
   </script>
 </body>
