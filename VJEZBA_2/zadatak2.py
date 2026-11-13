@@ -1,5 +1,4 @@
 import asyncio
-import time
 
 async def dohvati_korisnike():
     await asyncio.sleep(3)  
